@@ -17,7 +17,8 @@ func Provider() terraform.ResourceProvider {
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
-			"vault_mount": resourceVaultMount(),
+			"vault_auth_backend": resourceVaultAuthBackend(),
+			"vault_mount":        resourceVaultMount(),
 		},
 
 		ConfigureFunc: providerConfigure,
