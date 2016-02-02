@@ -20,6 +20,7 @@ func Provider() terraform.ResourceProvider {
 			"vault_audit_backend": resourceVaultAuditBackend(),
 			"vault_auth_backend":  resourceVaultAuthBackend(),
 			"vault_mount":         resourceVaultMount(),
+			"vault_policy":        resourceVaultPolicy(),
 		},
 
 		ConfigureFunc: providerConfigure,
