@@ -1,12 +1,15 @@
-package lang
+package hil
 
 import (
-	"github.com/hashicorp/terraform/config/lang/ast"
+	"github.com/hashicorp/hil/ast"
 )
 
 // FixedValueTransform transforms an AST to return a fixed value for
-// all interpolations. i.e. you can make "hello ${anything}" always
-// turn into "hello foo".
+// all interpolations. i.e. you can make "hi ${anything}" always
+// turn into "hi foo".
+//
+// The primary use case for this is for config validations where you can
+// verify that interpolations result in a certain type of string.
 func FixedValueTransform(root ast.Node, Value *ast.LiteralNode) ast.Node {
 	// We visit the nodes in top-down order
 	result := root

@@ -51,9 +51,9 @@ state 5
 
 
 state 6
-	literal:  STRING.    (19)
+	literal:  STRING.    (18)
 
-	.  reduce 19 (src line 163)
+	.  reduce 18 (src line 155)
 
 
 state 7
@@ -61,8 +61,7 @@ state 7
 
 	PROGRAM_BRACKET_LEFT  shift 7
 	PAREN_LEFT  shift 10
-	ARITH_OP  shift 14
-	IDENTIFIER  shift 15
+	IDENTIFIER  shift 14
 	INTEGER  shift 12
 	FLOAT  shift 13
 	STRING  shift 6
@@ -84,8 +83,8 @@ state 9
 	interpolation:  PROGRAM_BRACKET_LEFT expr.PROGRAM_BRACKET_RIGHT 
 	expr:  expr.ARITH_OP expr 
 
-	PROGRAM_BRACKET_RIGHT  shift 16
-	ARITH_OP  shift 17
+	PROGRAM_BRACKET_RIGHT  shift 15
+	ARITH_OP  shift 16
 	.  error
 
 
@@ -94,14 +93,13 @@ state 10
 
 	PROGRAM_BRACKET_LEFT  shift 7
 	PAREN_LEFT  shift 10
-	ARITH_OP  shift 14
-	IDENTIFIER  shift 15
+	IDENTIFIER  shift 14
 	INTEGER  shift 12
 	FLOAT  shift 13
 	STRING  shift 6
 	.  error
 
-	expr  goto 18
+	expr  goto 17
 	interpolation  goto 5
 	literal  goto 4
 	literalModeTop  goto 11
@@ -132,12 +130,25 @@ state 13
 
 
 state 14
-	expr:  ARITH_OP.expr 
+	expr:  IDENTIFIER.    (13)
+	expr:  IDENTIFIER.PAREN_LEFT args PAREN_RIGHT 
+
+	PAREN_LEFT  shift 18
+	.  reduce 13 (src line 133)
+
+
+state 15
+	interpolation:  PROGRAM_BRACKET_LEFT expr PROGRAM_BRACKET_RIGHT.    (7)
+
+	.  reduce 7 (src line 94)
+
+
+state 16
+	expr:  expr ARITH_OP.expr 
 
 	PROGRAM_BRACKET_LEFT  shift 7
 	PAREN_LEFT  shift 10
-	ARITH_OP  shift 14
-	IDENTIFIER  shift 15
+	IDENTIFIER  shift 14
 	INTEGER  shift 12
 	FLOAT  shift 13
 	STRING  shift 6
@@ -149,145 +160,104 @@ state 14
 	literalModeTop  goto 11
 	literalModeValue  goto 3
 
-state 15
-	expr:  IDENTIFIER.    (14)
-	expr:  IDENTIFIER.PAREN_LEFT args PAREN_RIGHT 
-
-	PAREN_LEFT  shift 20
-	.  reduce 14 (src line 141)
-
-
-state 16
-	interpolation:  PROGRAM_BRACKET_LEFT expr PROGRAM_BRACKET_RIGHT.    (7)
-
-	.  reduce 7 (src line 94)
-
-
 state 17
-	expr:  expr ARITH_OP.expr 
-
-	PROGRAM_BRACKET_LEFT  shift 7
-	PAREN_LEFT  shift 10
-	ARITH_OP  shift 14
-	IDENTIFIER  shift 15
-	INTEGER  shift 12
-	FLOAT  shift 13
-	STRING  shift 6
-	.  error
-
-	expr  goto 21
-	interpolation  goto 5
-	literal  goto 4
-	literalModeTop  goto 11
-	literalModeValue  goto 3
-
-state 18
 	expr:  PAREN_LEFT expr.PAREN_RIGHT 
 	expr:  expr.ARITH_OP expr 
 
-	PAREN_RIGHT  shift 22
-	ARITH_OP  shift 17
+	PAREN_RIGHT  shift 20
+	ARITH_OP  shift 16
 	.  error
 
 
-state 19
-	expr:  expr.ARITH_OP expr 
-	expr:  ARITH_OP expr.    (13)
-
-	.  reduce 13 (src line 133)
-
-
-state 20
+state 18
 	expr:  IDENTIFIER PAREN_LEFT.args PAREN_RIGHT 
-	args: .    (16)
+	args: .    (15)
 
 	PROGRAM_BRACKET_LEFT  shift 7
 	PAREN_LEFT  shift 10
-	ARITH_OP  shift 14
-	IDENTIFIER  shift 15
+	IDENTIFIER  shift 14
 	INTEGER  shift 12
 	FLOAT  shift 13
 	STRING  shift 6
-	.  reduce 16 (src line 150)
+	.  reduce 15 (src line 142)
 
-	expr  goto 24
+	expr  goto 22
 	interpolation  goto 5
 	literal  goto 4
 	literalModeTop  goto 11
 	literalModeValue  goto 3
-	args  goto 23
+	args  goto 21
 
-state 21
+state 19
 	expr:  expr.ARITH_OP expr 
 	expr:  expr ARITH_OP expr.    (12)
 
 	.  reduce 12 (src line 125)
 
 
-state 22
+state 20
 	expr:  PAREN_LEFT expr PAREN_RIGHT.    (8)
 
 	.  reduce 8 (src line 100)
 
 
-state 23
+state 21
 	expr:  IDENTIFIER PAREN_LEFT args.PAREN_RIGHT 
 	args:  args.COMMA expr 
 
-	PAREN_RIGHT  shift 25
-	COMMA  shift 26
+	PAREN_RIGHT  shift 23
+	COMMA  shift 24
 	.  error
 
 
-state 24
+state 22
 	expr:  expr.ARITH_OP expr 
-	args:  expr.    (18)
+	args:  expr.    (17)
 
-	ARITH_OP  shift 17
-	.  reduce 18 (src line 158)
-
-
-state 25
-	expr:  IDENTIFIER PAREN_LEFT args PAREN_RIGHT.    (15)
-
-	.  reduce 15 (src line 145)
+	ARITH_OP  shift 16
+	.  reduce 17 (src line 150)
 
 
-state 26
+state 23
+	expr:  IDENTIFIER PAREN_LEFT args PAREN_RIGHT.    (14)
+
+	.  reduce 14 (src line 137)
+
+
+state 24
 	args:  args COMMA.expr 
 
 	PROGRAM_BRACKET_LEFT  shift 7
 	PAREN_LEFT  shift 10
-	ARITH_OP  shift 14
-	IDENTIFIER  shift 15
+	IDENTIFIER  shift 14
 	INTEGER  shift 12
 	FLOAT  shift 13
 	STRING  shift 6
 	.  error
 
-	expr  goto 27
+	expr  goto 25
 	interpolation  goto 5
 	literal  goto 4
 	literalModeTop  goto 11
 	literalModeValue  goto 3
 
-state 27
+state 25
 	expr:  expr.ARITH_OP expr 
-	args:  args COMMA expr.    (17)
+	args:  args COMMA expr.    (16)
 
-	ARITH_OP  shift 17
-	.  reduce 17 (src line 154)
+	ARITH_OP  shift 16
+	.  reduce 16 (src line 146)
 
 
 15 terminals, 8 nonterminals
-20 grammar rules, 28/2000 states
+19 grammar rules, 26/2000 states
 0 shift/reduce, 0 reduce/reduce conflicts reported
 57 working sets used
-memory: parser 40/30000
-23 extra closures
-57 shift entries, 1 exceptions
-15 goto entries
-27 entries saved by goto default
-Optimizer space used: output 34/30000
-34 table entries, 2 zero
-maximum spread: 15, maximum offset: 26
+memory: parser 35/30000
+21 extra closures
+45 shift entries, 1 exceptions
+14 goto entries
+23 entries saved by goto default
+Optimizer space used: output 30/30000
+30 table entries, 0 zero
+maximum spread: 15, maximum offset: 24

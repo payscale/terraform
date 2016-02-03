@@ -3,10 +3,10 @@
 // package, as the lexer has the go generate pragma within it.
 
 %{
-package lang
+package hil
 
 import (
-    "github.com/hashicorp/terraform/config/lang/ast"
+    "github.com/hashicorp/hil/ast"
 )
 
 %}
@@ -128,14 +128,6 @@ expr:
             Op:    $2.Value.(ast.ArithmeticOp),
             Exprs: []ast.Node{$1, $3},
             Posx:  $1.Pos(),
-        }
-    }
-|   ARITH_OP expr
-    {
-        $$ = &ast.UnaryArithmetic{
-            Op:    $1.Value.(ast.ArithmeticOp),
-            Expr:  $2,
-            Posx:  $1.Pos,
         }
     }
 |   IDENTIFIER

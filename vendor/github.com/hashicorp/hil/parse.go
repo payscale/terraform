@@ -1,9 +1,9 @@
-package lang
+package hil
 
 import (
 	"sync"
 
-	"github.com/hashicorp/terraform/config/lang/ast"
+	"github.com/hashicorp/hil/ast"
 )
 
 var parserErrors []error

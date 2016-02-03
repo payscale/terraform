@@ -1,4 +1,4 @@
-package lang
+package hil
 
 import (
 	"bytes"
@@ -7,7 +7,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/hashicorp/terraform/config/lang/ast"
+	"github.com/hashicorp/hil/ast"
 )
 
 //go:generate go tool yacc -p parser lang.y

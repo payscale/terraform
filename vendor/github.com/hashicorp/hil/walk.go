@@ -1,30 +1,59 @@
-package config
+package hil
 
 import (
 	"fmt"
 	"reflect"
 	"strings"
 
-	"github.com/hashicorp/hil"
 	"github.com/hashicorp/hil/ast"
 	"github.com/mitchellh/reflectwalk"
 )
+
+// WalkFn is the type of function to pass to Walk. Modify fields within
+// WalkData to control whether replacement happens.
+type WalkFn func(*WalkData) error
+
+// WalkData is the structure passed to the callback of the Walk function.
+//
+// This structure contains data passed in as well as fields that are expected
+// to be written by the caller as a result. Please see the documentation for
+// each field for more information.
+type WalkData struct {
+	// Root is the parsed root of this HIL program
+	Root ast.Node
+
+	// Location is the location within the structure where this
+	// value was found. This can be used to modify behavior within
+	// slices and so on.
+	Location reflectwalk.Location
+
+	// The below two values must be set by the callback to have any effect.
+	//
+	// Replace, if true, will replace the value in the structure with
+	// ReplaceValue. It is up to the caller to make sure this is a string.
+	Replace      bool
+	ReplaceValue string
+}
+
+// Walk will walk an arbitrary Go structure and parse any string as an
+// HIL program and call the callback cb to determine what to replace it
+// with.
+//
+// This function is very useful for arbitrary HIL program interpolation
+// across a complex configuration structure. Due to the heavy use of
+// reflection in this function, it is recommend to write many unit tests
+// with your typical configuration structures to hilp mitigate the risk
+// of panics.
+func Walk(v interface{}, cb WalkFn) error {
+	walker := &interpolationWalker{F: cb}
+	return reflectwalk.Walk(v, walker)
+}
 
 // interpolationWalker implements interfaces for the reflectwalk package
 // (github.com/mitchellh/reflectwalk) that can be used to automatically
 // execute a callback for an interpolation.
 type interpolationWalker struct {
-	// F is the function to call for every interpolation. It can be nil.
-	//
-	// If Replace is true, then the return value of F will be used to
-	// replace the interpolation.
-	F       interpolationWalkerFunc
-	Replace bool
-
-	// ContextF is an advanced version of F that also receives the
-	// location of where it is in the structure. This lets you do
-	// context-aware validation.
-	ContextF interpolationWalkerContextFunc
+	F WalkFn
 
 	key         []string
 	lastValue   reflect.Value
@@ -35,22 +64,6 @@ type interpolationWalker struct {
 	sliceIndex  int
 	unknownKeys []string
 }
-
-// interpolationWalkerFunc is the callback called by interpolationWalk.
-// It is called with any interpolation found. It should return a value
-// to replace the interpolation with, along with any errors.
-//
-// If Replace is set to false in interpolationWalker, then the replace
-// value can be anything as it will have no effect.
-type interpolationWalkerFunc func(ast.Node) (string, error)
-
-// interpolationWalkerContextFunc is called by interpolationWalk if
-// ContextF is set. This receives both the interpolation and the location
-// where the interpolation is.
-//
-// This callback can be used to validate the location of the interpolation
-// within the configuration.
-type interpolationWalkerContextFunc func(reflectwalk.Location, ast.Node)
 
 func (w *interpolationWalker) Enter(loc reflectwalk.Location) error {
 	w.loc = loc
@@ -113,7 +126,7 @@ func (w *interpolationWalker) Primitive(v reflect.Value) error {
 		return nil
 	}
 
-	astRoot, err := hil.Parse(v.String())
+	astRoot, err := Parse(v.String())
 	if err != nil {
 		return err
 	}
@@ -129,44 +142,26 @@ func (w *interpolationWalker) Primitive(v reflect.Value) error {
 		}
 	}
 
-	if w.ContextF != nil {
-		w.ContextF(w.loc, astRoot)
-	}
-
 	if w.F == nil {
 		return nil
 	}
 
-	replaceVal, err := w.F(astRoot)
-	if err != nil {
+	data := WalkData{Root: astRoot, Location: w.loc}
+	if err := w.F(&data); err != nil {
 		return fmt.Errorf(
 			"%s in:\n\n%s",
 			err, v.String())
 	}
 
-	if w.Replace {
-		// We need to determine if we need to remove this element
-		// if the result contains any "UnknownVariableValue" which is
-		// set if it is computed. This behavior is different if we're
-		// splitting (in a SliceElem) or not.
-		remove := false
-		if w.loc == reflectwalk.SliceElem && IsStringList(replaceVal) {
-			parts := StringList(replaceVal).Slice()
-			for _, p := range parts {
-				if p == UnknownVariableValue {
-					remove = true
-					break
-				}
+	if data.Replace {
+		/*
+			if remove {
+				w.removeCurrent()
+				return nil
 			}
-		} else if replaceVal == UnknownVariableValue {
-			remove = true
-		}
-		if remove {
-			w.removeCurrent()
-			return nil
-		}
+		*/
 
-		resultVal := reflect.ValueOf(replaceVal)
+		resultVal := reflect.ValueOf(data.ReplaceValue)
 		switch w.loc {
 		case reflectwalk.MapKey:
 			m := w.cs[len(w.cs)-1]
@@ -244,16 +239,6 @@ func (w *interpolationWalker) splitSlice() {
 	// Check if we have any elements that we need to split. If not, then
 	// just return since we're done.
 	split := false
-	for _, v := range s {
-		sv, ok := v.(string)
-		if !ok {
-			continue
-		}
-		if IsStringList(sv) {
-			split = true
-			break
-		}
-	}
 	if !split {
 		return
 	}
@@ -268,13 +253,6 @@ func (w *interpolationWalker) splitSlice() {
 		if !ok {
 			// Not a string, so just set it
 			result = append(result, v)
-			continue
-		}
-
-		if IsStringList(sv) {
-			for _, p := range StringList(sv).Slice() {
-				result = append(result, p)
-			}
 			continue
 		}
 

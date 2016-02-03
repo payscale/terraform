@@ -1,11 +1,11 @@
-package lang
+package hil
 
 import (
 	"bytes"
 	"fmt"
 	"sync"
 
-	"github.com/hashicorp/terraform/config/lang/ast"
+	"github.com/hashicorp/hil/ast"
 )
 
 // EvalConfig is the configuration for evaluating.

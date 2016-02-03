@@ -1,11 +1,11 @@
 //line lang.y:6
-package lang
+package hil
 
 import __yyfmt__ "fmt"
 
 //line lang.y:6
 import (
-	"github.com/hashicorp/terraform/config/lang/ast"
+	"github.com/hashicorp/hil/ast"
 )
 
 //line lang.y:14
@@ -53,7 +53,7 @@ const parserEofCode = 1
 const parserErrCode = 2
 const parserMaxDepth = 200
 
-//line lang.y:173
+//line lang.y:165
 
 //line yacctab:1
 var parserExca = [...]int{
@@ -62,52 +62,51 @@ var parserExca = [...]int{
 	-2, 0,
 }
 
-const parserNprod = 20
+const parserNprod = 19
 const parserPrivate = 57344
 
 var parserTokenNames []string
 var parserStates []string
 
-const parserLast = 34
+const parserLast = 30
 
 var parserAct = [...]int{
 
-	9, 7, 3, 16, 22, 8, 17, 17, 20, 17,
-	1, 18, 6, 23, 8, 19, 25, 26, 21, 11,
-	2, 24, 7, 4, 5, 0, 10, 27, 0, 14,
-	15, 12, 13, 6,
+	9, 20, 16, 16, 7, 7, 3, 18, 10, 8,
+	1, 17, 14, 12, 13, 6, 6, 19, 8, 22,
+	15, 23, 24, 11, 2, 25, 16, 21, 4, 5,
 }
 var parserPact = [...]int{
 
-	-3, -1000, -3, -1000, -1000, -1000, -1000, 18, -1000, -2,
-	18, -3, -1000, -1000, 18, 0, -1000, 18, -5, -1000,
-	18, -1000, -1000, 7, -4, -1000, 18, -4,
+	1, -1000, 1, -1000, -1000, -1000, -1000, 0, -1000, 15,
+	0, 1, -1000, -1000, -1, -1000, 0, -8, 0, -1000,
+	-1000, 12, -9, -1000, 0, -9,
 }
 var parserPgo = [...]int{
 
-	0, 0, 24, 23, 19, 2, 13, 10,
+	0, 0, 29, 28, 23, 6, 27, 10,
 }
 var parserR1 = [...]int{
 
 	0, 7, 7, 4, 4, 5, 5, 2, 1, 1,
-	1, 1, 1, 1, 1, 1, 6, 6, 6, 3,
+	1, 1, 1, 1, 1, 6, 6, 6, 3,
 }
 var parserR2 = [...]int{
 
 	0, 0, 1, 1, 2, 1, 1, 3, 3, 1,
-	1, 1, 3, 2, 1, 4, 0, 3, 1, 1,
+	1, 1, 3, 1, 4, 0, 3, 1, 1,
 }
 var parserChk = [...]int{
 
 	-1000, -7, -4, -5, -3, -2, 15, 4, -5, -1,
-	8, -4, 13, 14, 11, 12, 5, 11, -1, -1,
-	8, -1, 9, -6, -1, 9, 10, -1,
+	8, -4, 13, 14, 12, 5, 11, -1, 8, -1,
+	9, -6, -1, 9, 10, -1,
 }
 var parserDef = [...]int{
 
-	1, -2, 2, 3, 5, 6, 19, 0, 4, 0,
-	0, 9, 10, 11, 0, 14, 7, 0, 0, 13,
-	16, 12, 8, 0, 18, 15, 0, 17,
+	1, -2, 2, 3, 5, 6, 18, 0, 4, 0,
+	0, 9, 10, 11, 13, 7, 0, 0, 15, 12,
+	8, 0, 17, 14, 0, 16,
 }
 var parserTok1 = [...]int{
 
@@ -578,48 +577,38 @@ parserdefault:
 			}
 		}
 	case 13:
-		parserDollar = parserS[parserpt-2 : parserpt+1]
-		//line lang.y:134
-		{
-			parserVAL.node = &ast.UnaryArithmetic{
-				Op:   parserDollar[1].token.Value.(ast.ArithmeticOp),
-				Expr: parserDollar[2].node,
-				Posx: parserDollar[1].token.Pos,
-			}
-		}
-	case 14:
 		parserDollar = parserS[parserpt-1 : parserpt+1]
-		//line lang.y:142
+		//line lang.y:134
 		{
 			parserVAL.node = &ast.VariableAccess{Name: parserDollar[1].token.Value.(string), Posx: parserDollar[1].token.Pos}
 		}
-	case 15:
+	case 14:
 		parserDollar = parserS[parserpt-4 : parserpt+1]
-		//line lang.y:146
+		//line lang.y:138
 		{
 			parserVAL.node = &ast.Call{Func: parserDollar[1].token.Value.(string), Args: parserDollar[3].nodeList, Posx: parserDollar[1].token.Pos}
 		}
-	case 16:
+	case 15:
 		parserDollar = parserS[parserpt-0 : parserpt+1]
-		//line lang.y:151
+		//line lang.y:143
 		{
 			parserVAL.nodeList = nil
 		}
-	case 17:
+	case 16:
 		parserDollar = parserS[parserpt-3 : parserpt+1]
-		//line lang.y:155
+		//line lang.y:147
 		{
 			parserVAL.nodeList = append(parserDollar[1].nodeList, parserDollar[3].node)
 		}
-	case 18:
+	case 17:
 		parserDollar = parserS[parserpt-1 : parserpt+1]
-		//line lang.y:159
+		//line lang.y:151
 		{
 			parserVAL.nodeList = append(parserVAL.nodeList, parserDollar[1].node)
 		}
-	case 19:
+	case 18:
 		parserDollar = parserS[parserpt-1 : parserpt+1]
-		//line lang.y:165
+		//line lang.y:157
 		{
 			parserVAL.node = &ast.LiteralNode{
 				Value: parserDollar[1].token.Value.(string),
