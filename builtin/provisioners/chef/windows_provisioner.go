@@ -9,21 +9,12 @@ import (
 	"github.com/hashicorp/terraform/terraform"
 )
 
+// there used to be code in this template for version and arch but chef only supports this combo now
 const installScript = `
 $winver = [System.Environment]::OSVersion.Version | %% {"{0}.{1}" -f $_.Major,$_.Minor}
 
-switch ($winver)
-{
-  "6.0" {$machine_os = "2008"}
-  "6.1" {$machine_os = "2008r2"}
-  "6.2" {$machine_os = "2012"}
-  "6.3" {$machine_os = "2012"}
-  default {$machine_os = "2008r2"}
-}
 
-if ([System.IntPtr]::Size -eq 4) {$machine_arch = "i686"} else {$machine_arch = "x86_64"}
-
-$url = "http://www.chef.io/chef/download?p=windows&pv=$machine_os&m=$machine_arch&v=%s"
+$url = "https://opscode-omnibus-packages.s3.amazonaws.com/windows/2008r2/x86_64/chef-client-%s-1.msi"
 $dest = [System.IO.Path]::GetTempFileName()
 $dest = [System.IO.Path]::ChangeExtension($dest, ".msi")
 $downloader = New-Object System.Net.WebClient
